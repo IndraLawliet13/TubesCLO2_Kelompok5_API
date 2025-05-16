@@ -23,7 +23,7 @@ namespace TubesCLO2_Kelompok5_API.Controllers
 
         // GET: api/mahasiswa -> Mengambil semua data mahasiswa
         [HttpGet]
-        public ActionResult<IEnumerable<Mahasiswa>> GetAllMahasiswa(
+        public ActionResult<object> GetAllMahasiswa(
             [FromQuery] string? nim,
             [FromQuery] string? nama
             )
@@ -51,44 +51,86 @@ namespace TubesCLO2_Kelompok5_API.Controllers
             if (!result.Any())
             {
                 _logger.LogWarning("Tidak ada mahasiswa yang cocok dengan kriteria pencarian.");
-                return Ok(new List<Mahasiswa>()); // Return list kosong (200 OK)
+                var response = new
+                {
+                    status = 200,
+                    message = "Tidak ada mahasiswa yang cocok dengan kriteria pencarian.",
+                    data = new List<Mahasiswa>()
+                };
+                return Ok(response);
             }
-
-            return Ok(result.ToList()); // Return 200 OK dengan list hasil filter
+            var successResponse = new
+            {
+                status = 200,
+                message = "Berhasil mengambil data mahasiswa.",
+                data = result.ToList()
+            };
+            return Ok(successResponse);
         }
 
         // GET: api/mahasiswa/{nim} -> Mengambil mahasiswa berdasarkan NIM
         [HttpGet("{nim}")]
-        public ActionResult<Mahasiswa> GetMahasiswaByNIM(string nim)
+        public ActionResult<object> GetMahasiswaByNIM(string nim)
         {
             _logger.LogInformation($"Mencari mahasiswa dengan NIM: {nim}");
             var mahasiswa = _mahasiswaList.FirstOrDefault(m => m.NIM.Equals(nim, StringComparison.OrdinalIgnoreCase));
             if (mahasiswa == null)
             {
                 _logger.LogWarning($"Mahasiswa dengan NIM: {nim} tidak ditemukan.");
-                return NotFound(); // Return 404 Not Found jika tidak ada
+                var response = new
+                {
+                    status = 404,
+                    message = $"Mahasiswa dengan NIM {nim} tidak ditemukan.",
+                    data = null as object
+                };
+                return NotFound(response);
             }
-            return Ok(mahasiswa); // Return 200 OK dengan data mahasiswa
+            var successResponse = new
+            {
+                status = 200,
+                message = $"Berhasil mengambil data mahasiswa dengan NIM {nim}.",
+                data = mahasiswa
+            };
+            return Ok(successResponse);
         }
 
         // POST: api/mahasiswa -> Menambah mahasiswa baru
         [HttpPost]
-        public ActionResult<Mahasiswa> AddMahasiswa([FromBody] Mahasiswa mahasiswaBaru)
+        public ActionResult<object> AddMahasiswa([FromBody] Mahasiswa mahasiswaBaru)
         {
             if (mahasiswaBaru == null || string.IsNullOrWhiteSpace(mahasiswaBaru.NIM) || string.IsNullOrWhiteSpace(mahasiswaBaru.Nama))
             {
-                return BadRequest("Data mahasiswa tidak valid."); // Return 400 Bad Request
+                var errorResponse = new
+                {
+                    status = 400,
+                    message = "Data mahasiswa tidak valid. NIM dan Nama tidak boleh kosong.",
+                    data = null as object
+                };
+                return BadRequest(errorResponse);
             }
             // Cek duplikasi NIM
             if (_mahasiswaList.Any(m => m.NIM.Equals(mahasiswaBaru.NIM, StringComparison.OrdinalIgnoreCase)))
             {
                 _logger.LogWarning($"NIM {mahasiswaBaru.NIM} sudah ada.");
-                return Conflict($"Mahasiswa dengan NIM {mahasiswaBaru.NIM} sudah ada."); // Return 409 Conflict
+                // return Conflict($"Mahasiswa dengan NIM {mahasiswaBaru.NIM} sudah ada.");
+                var conflictResponse = new
+                {
+                    status = 409,
+                    message = $"Mahasiswa dengan NIM {mahasiswaBaru.NIM} sudah ada.",
+                    data = new { nim = mahasiswaBaru.NIM }
+                };
+                return Conflict(conflictResponse);
             }
             _logger.LogInformation($"Menambahkan mahasiswa baru: {mahasiswaBaru.NIM} - {mahasiswaBaru.Nama}");
             _mahasiswaList.Add(mahasiswaBaru);
             // Return 201 Created dengan lokasi resource baru dan data yang ditambahkan
-            return CreatedAtAction(nameof(GetMahasiswaByNIM), new { nim = mahasiswaBaru.NIM }, mahasiswaBaru);
+            var response = new
+            {
+                status = 201,
+                message = "Berhasil menambah data mahasiswa.",
+                data = mahasiswaBaru
+            };
+            return StatusCode(201, response);
         }
 
         // PUT: api/mahasiswa/{nim} -> Mengupdate data mahasiswa
@@ -97,17 +139,35 @@ namespace TubesCLO2_Kelompok5_API.Controllers
         {
             if (mahasiswaUpdate == null || !nim.Equals(mahasiswaUpdate.NIM, StringComparison.OrdinalIgnoreCase))
             {
-                return BadRequest("Data update tidak valid atau NIM tidak cocok."); // Return 400
+                var errorResponse = new
+                {
+                    status = 400,
+                    message = "Data update tidak valid atau NIM pada body request tidak cocok dengan NIM pada URL.",
+                    data = null as object
+                };
+                return BadRequest(errorResponse);
             }
             var index = _mahasiswaList.FindIndex(m => m.NIM.Equals(nim, StringComparison.OrdinalIgnoreCase));
             if (index == -1)
             {
                 _logger.LogWarning($"Mahasiswa dengan NIM: {nim} tidak ditemukan untuk diupdate.");
-                return NotFound(); // Return 404
+                var notFoundResponse = new
+                {
+                    status = 404,
+                    message = $"Mahasiswa dengan NIM {nim} tidak ditemukan untuk diupdate.",
+                    data = null as object
+                };
+                return NotFound(notFoundResponse);
             }
             _logger.LogInformation($"Mengupdate mahasiswa: {nim}");
-            _mahasiswaList[index] = mahasiswaUpdate; // Mengganti data lama dengan data yang baru
-            return NoContent(); // Return 204 No Content (sukses tanpa body response)
+            _mahasiswaList[index] = mahasiswaUpdate;
+            var successResponse = new
+            {
+                status = 200,
+                message = $"Berhasil mengupdate data mahasiswa dengan NIM {nim}.",
+                data = mahasiswaUpdate
+            };
+            return Ok(successResponse);
         }
 
         // DELETE: api/mahasiswa/{nim} -> Menghapus data mahasiswa
@@ -118,11 +178,23 @@ namespace TubesCLO2_Kelompok5_API.Controllers
             if (mahasiswa == null)
             {
                 _logger.LogWarning($"Mahasiswa dengan NIM: {nim} tidak ditemukan untuk dihapus.");
-                return NotFound(); // Return 404
+                var notFoundResponse = new
+                {
+                    status = 404,
+                    message = $"Mahasiswa dengan NIM {nim} tidak ditemukan untuk dihapus.",
+                    data = null as object
+                };
+                return NotFound(notFoundResponse);
             }
             _logger.LogInformation($"Menghapus mahasiswa: {nim}");
             _mahasiswaList.Remove(mahasiswa);
-            return NoContent(); // Return 204 No Content
+            var successResponse = new
+            {
+                status = 200,
+                message = $"Berhasil menghapus data mahasiswa dengan NIM {nim}.",
+                data = null as object
+            };
+            return Ok(successResponse);
         }
     }
 }
