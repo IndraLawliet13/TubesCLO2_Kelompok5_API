@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35931.197 d17.13
+VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TubesCLO2_Kelompok5_API", "TubesCLO2_Kelompok5_API\TubesCLO2_Kelompok5_API.csproj", "{6A0351CD-FF72-41D4-A2A0-273881783FE4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TubesCLO2_Kelompok5_API.Tests", "TubesCLO2_Kelompok5_API.Tests\TubesCLO2_Kelompok5_API.Tests.csproj", "{F2A315AF-FBE1-4161-AE4C-A6EB5B00E5B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{6A0351CD-FF72-41D4-A2A0-273881783FE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A0351CD-FF72-41D4-A2A0-273881783FE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A0351CD-FF72-41D4-A2A0-273881783FE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2A315AF-FBE1-4161-AE4C-A6EB5B00E5B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2A315AF-FBE1-4161-AE4C-A6EB5B00E5B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2A315AF-FBE1-4161-AE4C-A6EB5B00E5B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2A315AF-FBE1-4161-AE4C-A6EB5B00E5B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
